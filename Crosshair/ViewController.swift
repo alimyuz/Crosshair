@@ -20,7 +20,14 @@ class ViewController: NSViewController {
     
     private lazy var sizeSlider: NSSlider = {
         let size = UserDefaults.standard.integer(forKey: "image.size")
-        let slider = NSSlider(value: Double(size), minValue: 1, maxValue: 200, target: self, action: #selector(sliderChanged))
+        let slider = NSSlider(value: Double(size), minValue: 1, maxValue: 200, target: self, action: #selector(sizeSliderChanged))
+        slider.translatesAutoresizingMaskIntoConstraints = false
+        return slider
+    }()
+    
+    private lazy var opacitySlider: NSSlider = {
+        let size = UserDefaults.standard.integer(forKey: "image.opacity")
+        let slider = NSSlider(value: Double(size), minValue: 1, maxValue: 100, target: self, action: #selector(opacitySliderChanged))
         slider.translatesAutoresizingMaskIntoConstraints = false
         return slider
     }()
@@ -48,6 +55,13 @@ class ViewController: NSViewController {
             sizeSlider.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
             sizeSlider.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
         ])
+        
+        view.addSubview(opacitySlider)
+        NSLayoutConstraint.activate([
+            opacitySlider.topAnchor.constraint(equalTo: sizeSlider.bottomAnchor, constant: 30),
+            opacitySlider.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
+            opacitySlider.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
+        ])
     }
     
     @objc
@@ -71,8 +85,15 @@ class ViewController: NSViewController {
     }
     
     @objc
-    private func sliderChanged(_ sender: NSSlider) {
+    private func sizeSliderChanged(_ sender: NSSlider) {
         UserDefaults.standard.set(sender.intValue, forKey: "image.size")
+        
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "image.updated"), object: nil)
+    }
+    
+    @objc
+    private func opacitySliderChanged(_ sender: NSSlider) {
+        UserDefaults.standard.set(sender.doubleValue / 100, forKey: "image.opacity")
         
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "image.updated"), object: nil)
     }

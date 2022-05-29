@@ -10,10 +10,9 @@ import AppKit
 
 class OverlayViewController: NSViewController {
     
-    private lazy var imageView: NSImageView = {
+    private let imageView: NSImageView = {
         let imageView = NSImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.image = crosshairImage()
         return imageView
     }()
     
@@ -44,6 +43,8 @@ class OverlayViewController: NSViewController {
     override func viewDidAppear() {
         view.window?.backgroundColor = .clear
         view.window?.isOpaque = false
+        
+        imageView.image = crosshairImage()
     }
     
     deinit {
@@ -51,12 +52,18 @@ class OverlayViewController: NSViewController {
     }
     
     private func crosshairImage() -> NSImage? {
+        // image
         guard let data = UserDefaults.standard.data(forKey: "image.data") else { return nil }
-        let size = UserDefaults.standard.integer(forKey: "image.size")
         
         let image = NSImage(data: data)
         
+        // size
+        let size = UserDefaults.standard.integer(forKey: "image.size")
         image?.size = NSSize(width: size, height: size)
+        
+        // opacity
+        let opacity = UserDefaults.standard.double(forKey: "image.opacity")
+        imageView.alphaValue = CGFloat(opacity)
         
         return image
     }
